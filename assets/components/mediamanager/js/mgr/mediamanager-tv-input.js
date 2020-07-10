@@ -65,7 +65,7 @@ $(document).ready(function() {
 
                 $imagePreview.css('max-width', 400).css('max-height', 300).attr('src', file.preview);
 
-                $('input#tv' + tvId).attr('value', file.id);
+                $('input#tv' + tvId).attr('value', file.path);
             }
         });
 
