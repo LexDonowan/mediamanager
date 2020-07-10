@@ -454,7 +454,9 @@ class MediaManagerFilesHelper
 
         $filePath = $source['baseUrl'];
         if ($source['baseUrlRelative'] !== false) {
-            $filePath = $this->addTrailingSlash($this->mediaManager->modx->getOption('site_url')) . $this->removeSlashes($source['baseUrl']) . DIRECTORY_SEPARATOR;
+            // $filePath = $this->addTrailingSlash($this->mediaManager->modx->getOption('site_url')) . $this->removeSlashes($source['baseUrl']) . DIRECTORY_SEPARATOR;
+            // Relative path
+            $filePath = $this->removeSlashes($source['baseUrl']) . DIRECTORY_SEPARATOR;
         }
 
         return $filePath . $file[$type];
@@ -2498,9 +2500,24 @@ class MediaManagerFilesHelper
             '-'
         );
 
+        $fileName = $this->translitFileName($fileName);
         $fileName = strtolower($fileName);
         $fileName = str_replace($find, $replace, $fileName);
         $fileName = preg_replace('/[^a-z0-9_.-]+/', '', $fileName);
+
+        return $fileName;
+    }
+    
+    public function translitFileName($fileName)
+    {
+        $options = array();
+
+        $translit = $this->mediaManager->modx->getOption('friendly_alias_translit', $options, 'russian');
+        $translitClass = $this->mediaManager->modx->getOption('friendly_alias_translit_class', $options, 'translit.modTransliterate');
+        $translitClassPath = $this->mediaManager->modx->getOption('friendly_alias_translit_class_path', $options, $this->mediaManager->modx->getOption('core_path', $options, MODX_CORE_PATH) . 'components/');
+        $transClass = $this->mediaManager->modx->getService('translit', $translitClass, $translitClassPath, $options);
+        
+        $fileName = $transClass->translate($fileName, $translit);
 
         return $fileName;
     }
